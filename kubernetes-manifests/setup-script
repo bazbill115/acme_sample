@@ -1,0 +1,58 @@
+printf "Create the secret for the cart service to use in auth with cache\n"
+
+oc create secret generic cart-redis-pass --from-literal=password=demo123
+
+printf "Deploy redis cache (cart datastore) and cart service\n"
+
+oc apply -f cart-redis-total.yaml
+oc apply -f cart-total.yaml
+
+printf "Create the secret for the catalog service to use in authenticating with cache\n"
+
+oc create secret generic catalog-mongo-pass --from-literal=password=demo123
+
+printf "Initialize the catalog db\n"
+
+oc create -f catalog-db-initdb-configmap.yaml
+
+printf "Deploy the Mongo + Catalog Service\n"
+
+oc apply -f catalog-db-total.yaml
+oc apply -f catalog-total.yaml
+
+printf "Payment service's datastore deployed\n"
+
+oc apply -f payment-total.yaml
+
+printf "Create the secret for orderdb + service auth with the cache\n"
+
+oc create secret generic order-postgres-pass --from-literal=password=demo123
+
+printf "Deploy mongo instance + order service"
+
+oc apply -f order-db-total.yaml
+oc apply -f order.total.yaml
+
+printf "Users database/cache/service -> needs to add secret to use before auth\n"
+
+oc create secret generic users-mongo-pass --from-literal=password=demo123
+oc create secret generic users-redis-pass --from-literal=password=demo123
+
+printf "Initialize the database with init set of users\n"
+
+oc create -f users-db-initdb-configmap.yaml 
+
+printf "Deploy user db and user service\n"
+
+oc apply -f users-db-total.yaml
+oc apply -f users-redis-total.yaml
+oc apply -f users-total.yaml
+
+printf "Frontend Deployment\n"
+
+oc apply -f frontend-total.yaml
+printf "oc get services -l service=frontend to get port\n"
+
+oc apply -f point-of-sales-total.yaml
+printf "oc get services -l service=pos\n"
+printf "See README.md for info on distributed tracing\n"
