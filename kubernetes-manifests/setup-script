@@ -31,7 +31,7 @@ oc create secret generic order-postgres-pass --from-literal=password=demo123
 printf "Deploy mongo instance + order service"
 
 oc apply -f order-db-total.yaml
-oc apply -f order.total.yaml
+oc apply -f order-total.yaml
 
 printf "Users database/cache/service -> needs to add secret to use before auth\n"
 
